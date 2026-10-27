@@ -1,0 +1,33 @@
+[project]
+name = "claude-trainer-bot"
+version = "0.1.0"
+description = "Персональный тренер в Telegram на Claude Agent SDK"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "claude-agent-sdk>=0.2.174",
+    "aiogram>=3.31,<4",
+    "apscheduler>=3.11,<4",
+    "playwright>=1.64",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[project.scripts]
+trainer-bot = "trainer_bot.main:run"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["trainer_bot*"]
+
+[tool.setuptools.package-data]
+trainer_bot = ["workspace_template/**/*", "workspace_template/**/.*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

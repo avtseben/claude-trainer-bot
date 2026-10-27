@@ -1,0 +1,12 @@
+services:
+  trainer-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      TRAINER_WORKSPACE: /home/app/trainer
+    volumes:
+      # Папка тренера видна с хоста: можно читать/править plan.md, log.md руками.
+      - ./data/trainer:/home/app/trainer
+      - ./data/claude:/home/app/.claude
+    shm_size: 512mb # Chromium падает с дефолтными 64 МБ

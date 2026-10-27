@@ -1,0 +1,27 @@
+# systemd-юнит. Поправьте User и пути, затем:
+#   sudo cp deploy/trainer-bot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now trainer-bot
+#   journalctl -u trainer-bot -f
+[Unit]
+Description=Claude personal trainer Telegram bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trainer
+WorkingDirectory=/home/trainer/claude-trainer-bot
+EnvironmentFile=/home/trainer/claude-trainer-bot/.env
+ExecStart=/home/trainer/claude-trainer-bot/.venv/bin/trainer-bot
+Restart=on-failure
+RestartSec=5
+
+# Ограничения: бот пишет только в свой дом.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindPaths=/home/trainer
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

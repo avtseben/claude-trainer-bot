@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>День A — всё тело</title>
+<style>
+  :root {
+    --bg: #f4f1ec;
+    --card: #ffffff;
+    --ink: #1d1b19;
+    --muted: #6f6a63;
+    --line: #e6e1d9;
+    --accent: #e8572a;
+    --accent-soft: #fde9e1;
+    --ok: #2f8f5b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 18px/1.45 -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+    padding: 28px;
+    width: 800px;
+  }
+  header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+  .eyebrow { color: var(--accent); font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { font-size: 34px; line-height: 1.1; margin-top: 4px; }
+  .meta { text-align: right; color: var(--muted); font-size: 15px; }
+  .meta b { color: var(--ink); font-size: 22px; display: block; }
+
+  .ex { display: grid; grid-template-columns: 150px 1fr; gap: 18px; background: var(--card);
+        border-radius: 18px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--line); }
+  .ex img { width: 150px; height: 112px; object-fit: cover; border-radius: 12px; background: var(--line); }
+  .ex h2 { font-size: 21px; margin-bottom: 2px; }
+  .ex .num { color: var(--accent); margin-right: 6px; }
+  .sets { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 6px; }
+  .pill { background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 999px;
+          padding: 3px 12px; font-size: 16px; }
+  .pill.rest { background: #eee9e2; color: var(--muted); font-weight: 600; }
+  .cue { color: var(--muted); font-size: 15px; }
+
+  .note { background: var(--ink); color: #fff; border-radius: 18px; padding: 16px 20px; margin-top: 16px; font-size: 16px; }
+  .note b { color: #ffb59c; }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="eyebrow">Неделя 2 · Пн 27 окт</div>
+      <h1>День A — всё тело</h1>
+    </div>
+    <div class="meta"><b>~25 мин</b>2 упражнения</div>
+  </header>
+
+  <!-- Повторяй блок .ex для каждого упражнения. Картинки: ../exercises-db/exercises/<id>/0.jpg -->
+  <div class="ex">
+    <img src="../exercises-db/exercises/Bodyweight_Squat/0.jpg" alt="">
+    <div>
+      <h2><span class="num">1</span>Приседания с весом тела</h2>
+      <div class="sets"><span class="pill">3 × 15</span><span class="pill rest">отдых 60 с</span></div>
+      <div class="cue">Колени по направлению носков, пятки не отрываются, спина нейтральная.</div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <img src="../exercises-db/exercises/Pushups/0.jpg" alt="">
+    <div>
+      <h2><span class="num">2</span>Отжимания</h2>
+      <div class="sets"><span class="pill">3 × 10–12</span><span class="pill rest">отдых 90 с</span></div>
+      <div class="cue">Корпус — прямая линия, локти под 45° к телу.</div>
+    </div>
+  </div>
+
+  <div class="note"><b>Прогрессия:</b> когда все подходы выполнены на верхней границе повторов — добавь 2–5 кг или усложни вариант.</div>
+</body>
+</html>
