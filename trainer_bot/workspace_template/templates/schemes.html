@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Силовая A — ноги</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="../templates/schemes.css">
+</head>
+<body>
+<!--
+  Карточка тренировки со схемами упражнений. Копируй в out/<дата>-<название>.html.
+  Одна тренировка — одна страница (иначе картинка выйдет слишком длинной для Telegram).
+  Список готовых схем и формат новых — в шапке templates/schemes.js.
+-->
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Неделя 1 · вторник 27.10 · после бега</div>
+    <h1>Силовая A: ноги</h1>
+    <p class="lead">Сегодня без веса и по 2 подхода: задача — выучить движения. Каждый подход заканчивай с запасом 2–3 повтора.</p>
+    <div class="chips">
+      <span class="chip">≈ <b>30</b> мин</span>
+      <span class="chip"><b>2</b> подхода</span>
+      <span class="chip">отдых <b>45–60</b> с</span>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--accent)"></i>работает</span>
+    <span><i class="sw" style="background:var(--ink)"></i>корпус и ближняя рука</span>
+    <span><i class="sw" style="background:var(--ink-soft)"></i>вторая нога</span>
+    <span><i class="sw" style="background:var(--move)"></i>движение и ориентиры</span>
+  </div>
+
+  <section class="grid">
+    <article class="ex">
+      <div class="ex-head"><h2><span class="num">1</span> Болгарские выпады</h2><span class="sets">2 × 12 / нога</span></div>
+      <div class="frames" data-ex="bulg"></div>
+      <p class="why">Бедро и ягодица передней ноги.</p>
+      <ul class="cues">
+        <li>Опускайся <b>вниз</b>, а не вперёд, пока заднее колено почти не коснётся пола.</li>
+        <li>Вес на передней пятке и середине стопы.</li>
+      </ul>
+      <p class="err"><b>Ошибка:</b> переднее колено заваливается внутрь.</p>
+    </article>
+
+    <article class="ex">
+      <div class="ex-head"><h2><span class="num">2</span> Подъём на носок со ступеньки</h2><span class="sets">2 × 12 / нога</span></div>
+      <div class="frames" data-ex="calf1"></div>
+      <p class="why">Икроножная мышца и ахилл.</p>
+      <ul class="cues">
+        <li>Вверх за 1 с, наверху пауза 1 с, <b>вниз за 3 с</b>.</li>
+      </ul>
+      <div class="warn">Болит крепление ахилла к пятке — опускай пятку только до уровня ступеньки.</div>
+    </article>
+
+    <article class="ex">
+      <div class="ex-head"><h2><span class="num">3</span> Мёртвый жук</h2><span class="sets">8 / сторона</span></div>
+      <div class="frames" data-ex="deadbug"></div>
+      <ul class="cues">
+        <li>Поясница всё время прижата к полу. Опускаешь на выдохе.</li>
+      </ul>
+    </article>
+
+    <article class="ex">
+      <div class="ex-head"><h2><span class="num">4</span> Приседания (своя схема)</h2><span class="sets">2 × 15</span></div>
+      <div class="frames" data-ex="squat"></div>
+      <ul class="cues">
+        <li>Пример новой схемы через <code>Schemes.add</code> — смотри скрипт внизу страницы.</li>
+      </ul>
+    </article>
+  </section>
+</div>
+
+<script src="../templates/schemes.js"></script>
+<script>
+  // Новая схема: копия похожей позы с изменёнными суставами.
+  Schemes.add({
+    squat: [
+      { label: 'Старт', vb: [160, 170], floor: 156,
+        fig: { head: [80, 21], sh: [80, 34], hip: [80, 79], kneeW: [82, 117], footW: [80, 155],
+               extraWork: [[[80, 155], [92, 155]]], elbN: [104, 40], handN: [128, 40] } },
+      { label: 'Низ: бедро параллельно полу', vb: [160, 170], floor: 156,
+        fig: { head: [92, 62], sh: [86, 74], hip: [56, 112], kneeW: [96, 114], footW: [82, 155],
+               extraWork: [[[82, 155], [94, 155]]], elbN: [110, 76], handN: [134, 76] },
+        arrows: [[[30, 70], [30, 104]]], texts: [[30, 64, 'таз назад', 'm', 'middle']] }
+    ]
+  });
+</script>
+</body>
+</html>

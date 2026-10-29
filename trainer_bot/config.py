@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+log = logging.getLogger(__name__)
 
 
 def _csv_ints(value: str) -> list[int]:
@@ -60,7 +63,8 @@ def load_settings() -> Settings:
         raise SystemExit("TELEGRAM_ALLOWED_USERS пуст — бот был бы открыт всем")
 
     if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
-        raise SystemExit("Нужен ANTHROPIC_API_KEY или CLAUDE_CODE_OAUTH_TOKEN")
+        # Локально CLI может быть уже залогинен (`claude login`), на сервере нужен один из токенов.
+        log.warning("ANTHROPIC_API_KEY и CLAUDE_CODE_OAUTH_TOKEN не заданы: используется вход из ~/.claude")
 
     budget = os.environ.get("CLAUDE_MAX_BUDGET_USD", "").strip()
 

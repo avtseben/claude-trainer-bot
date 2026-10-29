@@ -61,19 +61,18 @@ docker compose logs -f
 
 Папка тренера — `./data/trainer`, файлы можно читать и править руками.
 
-### 2б. Без Docker (venv + systemd)
+### 2б. Без Docker (отдельный пользователь + systemd)
+
+Пошагово, с проверками и эксплуатацией — [docs/DEPLOY.md](docs/DEPLOY.md). Коротко:
 
 ```bash
-sudo adduser trainer && sudo usermod -aG sudo trainer   # sudo нужен только для установки
-su - trainer
-git clone <этот репозиторий> && cd claude-trainer-bot
-./scripts/install.sh          # venv, Chromium, шрифты, база упражнений
-nano .env
-.venv/bin/trainer-bot         # проверить, Ctrl+C
-
-sudo cp deploy/trainer-bot.service /etc/systemd/system/
+sudo adduser --disabled-password trainer
+sudo apt-get install -y python3-venv git fonts-noto-core fonts-noto-color-emoji
+sudo -iu trainer sh -c 'git clone <этот репозиторий> && cd claude-trainer-bot && ./scripts/install.sh'
+sudo /home/trainer/claude-trainer-bot/.venv/bin/playwright install-deps chromium
+sudo -iu trainer nano claude-trainer-bot/.env
+sudo cp /home/trainer/claude-trainer-bot/deploy/trainer-bot.service /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now trainer-bot
-journalctl -u trainer-bot -f
 ```
 
 ### 3. Первое сообщение

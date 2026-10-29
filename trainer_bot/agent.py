@@ -37,6 +37,8 @@ TELEGRAM_CONTEXT = """
 
 OnText = Callable[[str], Awaitable[None]]
 
+MAX_BUFFER_SIZE = 32 * 1024 * 1024
+
 
 class SessionStore:
     """chat_id → session_id в JSON-файле, чтобы /clear и рестарт бота работали предсказуемо."""
@@ -106,6 +108,9 @@ class Agent:
             permission_mode="dontAsk",
             model=self.settings.model,
             max_budget_usd=self.settings.max_budget_usd,
+            # Read картинки (свой отрендеренный PNG, фото из inbox/) приходит одним JSON-сообщением
+            # с base64 внутри; дефолтного 1 МБ не хватает.
+            max_buffer_size=MAX_BUFFER_SIZE,
         )
 
     async def _chat(self, chat_id: int) -> ChatState:
