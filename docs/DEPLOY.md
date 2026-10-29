@@ -62,13 +62,12 @@ admin$ sudo apt-get install -y python3 python3-venv git \
 admin$ python3 --version   # нужен 3.11+
 ```
 
-Если RAM меньше 2 ГБ — добавить swap 1 ГБ, иначе Chromium или Claude CLI может прибить OOM-killer:
+Если RAM 1 ГБ — добавить swap, иначе Chromium может прибить OOM-killer:
 
 ```bash
 admin$ sudo fallocate -l 1G /swapfile && sudo chmod 600 /swapfile
 admin$ sudo mkswap /swapfile && sudo swapon /swapfile
 admin$ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-admin$ echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swappiness.conf && sudo sysctl --system
 ```
 
 ## 3. Код и зависимости (от trainer)
@@ -119,7 +118,10 @@ EVENING_CHECKIN=21:00
 
 ```bash
 mac$ cd ~/p/claude-trainer-bot/data/trainer
-mac$ COPYFILE_DISABLE=1 tar czf /tmp/trainer.tgz --exclude=exercises-db --exclude=.bot --exclude='*.png' .
+# --no-xattrs и COPYFILE_DISABLE: без macOS-атрибутов и файлов ._*, иначе GNU tar ругается
+# "Ignoring unknown extended header keyword LIBARCHIVE.xattr..." (безвредно, но шумно)
+mac$ COPYFILE_DISABLE=1 tar czf /tmp/trainer.tgz --no-xattrs --no-mac-metadata \
+       --exclude=exercises-db --exclude=.bot --exclude='*.png' .
 mac$ scp /tmp/trainer.tgz admin@<vps>:/tmp/
 ```
 

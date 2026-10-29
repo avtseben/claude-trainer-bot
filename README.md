@@ -32,9 +32,20 @@ Telegram ──► aiogram ──► ClaudeSDKClient (сессия на чат, 
 - **Напоминания**: утром — план на день, вечером — «как прошла тренировка?», если в журнале пусто.
 - Доступ только для id из `TELEGRAM_ALLOWED_USERS`.
 
-| Карточка тренировки | График прогресса |
+### Карточка тренировки со схемами
+
+Claude собирает HTML из `templates/schemes.html`: на каждое упражнение — SVG-фигурка в 2–3 кадрах
+(оранжевым — что работает, синим — движение), подсказки и типичная ошибка. Готовых поз 21
+(`templates/schemes.js`), новые Claude дорисовывает через `Schemes.add()`. Бот рендерит страницу
+в PNG и присылает в чат:
+
+<img src="docs/schemes.png" width="560" alt="Карточка силовой тренировки со схемами упражнений">
+
+### Фото из базы упражнений и график прогресса
+
+| `send_exercise` — 2 кадра из free-exercise-db | `templates/progress.html` — Chart.js |
 |---|---|
-| ![workout](docs/workout.png) | ![progress](docs/progress.png) |
+| ![Выпады с гантелями](docs/exercise-db.jpg) | ![График прогресса](docs/progress.png) |
 
 ## Быстрый старт
 
