@@ -11,11 +11,9 @@ from pathlib import Path
 
 from aiogram import Bot
 from claude_agent_sdk import (
-    AssistantMessage,
     ClaudeAgentOptions,
     ClaudeSDKClient,
     ResultMessage,
-    TextBlock,
 )
 
 from .config import Settings
@@ -29,6 +27,9 @@ TELEGRAM_CONTEXT = """
 Ты общаешься с пользователем через Telegram-бота, а не в терминале.
 - Пользователь видит только твой текст и то, что ты отправишь инструментами mcp__tg__*.
   Файлы, которые ты просто записал на диск, он не увидит.
+- Не отправляй промежуточные сообщения о ходе работы: «сейчас посмотрю», «запишу»,
+  «проверю». Молча выполни действия и отправь один итоговый ответ с результатом.
+  Не повторяй одни и те же данные до и после записи в журнал.
 - Пиши коротко, как в мессенджере. Форматирование: *жирный*, _курсив_, `код`, списки.
   Без таблиц и заголовков #: Telegram их не отображает. Таблицы и красивые планы делай
   HTML-артефактом и отправляй через mcp__tg__send_artifact.
@@ -124,22 +125,20 @@ class Agent:
             return state
 
     async def ask(self, chat_id: int, prompt: str, on_text: OnText) -> None:
-        """Отправляет сообщение в сессию; каждый текстовый блок ответа уходит в on_text сразу."""
+        """Отправляет сообщение в сессию; пользователю передаётся только итог хода."""
         state = await self._chat(chat_id)
         async with state.lock:
             try:
                 await state.client.query(prompt)
                 async for message in state.client.receive_response():
-                    if isinstance(message, AssistantMessage) and message.parent_tool_use_id is None:
-                        for block in message.content:
-                            if isinstance(block, TextBlock) and block.text.strip():
-                                await on_text(block.text)
-                    elif isinstance(message, ResultMessage):
+                    if isinstance(message, ResultMessage):
                         self.store.set(chat_id, message.session_id)
                         state.cost_usd += message.total_cost_usd or 0.0
                         state.turns += 1
                         if message.is_error:
                             await on_text(f"⚠️ Claude завершил ход с ошибкой: {message.subtype}")
+                        elif message.result and message.result.strip():
+                            await on_text(message.result)
             except Exception:
                 # Процесс CLI мог упасть: выкидываем клиента, следующий запрос поднимет его с resume.
                 log.exception("Ошибка в сессии чата %s", chat_id)

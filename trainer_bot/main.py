@@ -14,6 +14,7 @@ from aiogram.types import BotCommand, Message
 from aiogram.utils.chat_action import ChatActionSender
 
 from .agent import Agent
+from .codex_agent import CodexAgent
 from .config import Settings, load_settings
 from .exercises import ExerciseDb
 from .render import Renderer
@@ -25,7 +26,7 @@ log = logging.getLogger("trainer_bot")
 TEMPLATE_DIR = Path(__file__).parent / "workspace_template"
 
 HELP = (
-    "Я твой персональный тренер на Claude.\n\n"
+    "Я твой персональный тренер на AI.\n\n"
     "Просто пиши: «составь план на месяц», «покажи технику выпада», «сделал 3×10 приседа с 60 кг».\n"
     "Можно присылать фото (еда, техника, весы).\n\n"
     "/new — новая беседа (как /clear), план и журнал сохраняются\n"
@@ -93,9 +94,13 @@ def build_router(settings: Settings, bot: Bot, agent: Agent, ask: Ask) -> Router
     async def status(message: Message) -> None:
         info = agent.info(message.chat.id)
         await message.answer(
+            f"Движок: {settings.engine}\n"
             f"Сессия: {info.session_id or '— (новая)'}\n"
             f"Процесс запущен: {'да' if info.active else 'нет'}\n"
-            f"Ходов с запуска: {info.turns}, стоимость: ${info.cost_usd:.3f}\n"
+            f"Ходов с запуска: {info.turns}\n"
+            + ("Оплата: подписка ChatGPT (лимиты Codex)\n" if settings.engine == "codex"
+               else f"Стоимость: ${info.cost_usd:.3f}\n")
+            +
             f"Рабочая папка: {settings.workspace}"
         )
 
@@ -105,7 +110,7 @@ def build_router(settings: Settings, bot: Bot, agent: Agent, ask: Ask) -> Router
         rel = Path("inbox") / f"{stamp}.jpg"
         await bot.download(message.photo[-1], destination=settings.workspace / rel)
         caption = message.caption or "(без подписи)"
-        await ask_safely(message, f"Пользователь прислал фото: {rel} — посмотри его через Read.\nПодпись: {caption}")
+        await ask_safely(message, f"Пользователь прислал фото: {rel} — посмотри изображение доступным инструментом.\nПодпись: {caption}")
 
     @router.message(F.document, allowed)
     async def document(message: Message) -> None:
@@ -135,7 +140,8 @@ async def main() -> None:
 
     bot = Bot(settings.telegram_token)
     renderer = Renderer(width=settings.render_width)
-    agent = Agent(settings, bot, renderer, ExerciseDb(settings.exercises_dir))
+    agent_cls = CodexAgent if settings.engine == "codex" else Agent
+    agent = agent_cls(settings, bot, renderer, ExerciseDb(settings.exercises_dir))
 
     ask = make_ask(bot, agent)
     dp = Dispatcher()

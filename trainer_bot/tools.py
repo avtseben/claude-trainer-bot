@@ -41,7 +41,7 @@ def resolve_inside(workspace: Path, path: str) -> Path:
     return candidate
 
 
-def build_server(chat_id: int, bot: Bot, workspace: Path, renderer: Renderer, exercises: ExerciseDb):
+def build_tools(chat_id: int, bot: Bot, workspace: Path, renderer: Renderer, exercises: ExerciseDb):
     """Сервер собирается на каждый чат: инструменты знают, куда слать."""
 
     @tool(
@@ -178,8 +178,9 @@ def build_server(chat_id: int, bot: Bot, workspace: Path, renderer: Renderer, ex
         instructions = " ".join(item.instructions)
         return _ok(f"Отправлено {len(images)} фото «{item.name}». Инструкция из базы: {instructions}")
 
-    return create_sdk_mcp_server(
-        name=SERVER_NAME,
-        tools=[send_photo, send_artifact, send_file, search_exercises, send_exercise],
-    )
+    return [send_photo, send_artifact, send_file, search_exercises, send_exercise]
+
+
+def build_server(*args, **kwargs):
+    return create_sdk_mcp_server(name=SERVER_NAME, tools=build_tools(*args, **kwargs))
 

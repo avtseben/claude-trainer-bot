@@ -9,4 +9,5 @@ services:
       # Папка тренера видна с хоста: можно читать/править plan.md, log.md руками.
       - ./data/trainer:/home/app/trainer
       - ./data/claude:/home/app/.claude
+      - ./data/codex:/home/app/.codex
     shm_size: 512mb # Chromium падает с дефолтными 64 МБ

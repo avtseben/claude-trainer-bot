@@ -29,6 +29,9 @@ class Settings:
     telegram_token: str
     allowed_users: list[int]
     workspace: Path
+    engine: str = "claude"
+    codex_bin: str = "codex"
+    codex_reasoning_effort: str | None = None
     timezone: str = "Europe/Moscow"
     model: str | None = None
     max_budget_usd: float | None = None
@@ -62,18 +65,25 @@ def load_settings() -> Settings:
     if not allowed:
         raise SystemExit("TELEGRAM_ALLOWED_USERS пуст — бот был бы открыт всем")
 
-    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
+    engine = os.environ.get("AGENT_ENGINE", "claude").strip().lower()
+    if engine not in {"claude", "codex"}:
+        raise SystemExit("AGENT_ENGINE должен быть claude или codex")
+
+    if engine == "claude" and not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
         # Локально CLI может быть уже залогинен (`claude login`), на сервере нужен один из токенов.
         log.warning("ANTHROPIC_API_KEY и CLAUDE_CODE_OAUTH_TOKEN не заданы: используется вход из ~/.claude")
 
     budget = os.environ.get("CLAUDE_MAX_BUDGET_USD", "").strip()
 
     return Settings(
+        engine=engine,
+        codex_bin=os.environ.get("CODEX_BIN", "codex"),
+        codex_reasoning_effort=os.environ.get("CODEX_REASONING_EFFORT", "").strip() or None,
         telegram_token=token,
         allowed_users=allowed,
         workspace=Path(os.environ.get("TRAINER_WORKSPACE", "~/trainer")).expanduser().resolve(),
         timezone=os.environ.get("TRAINER_TIMEZONE", "Europe/Moscow"),
-        model=os.environ.get("CLAUDE_MODEL") or None,
+        model=os.environ.get("CODEX_MODEL" if engine == "codex" else "CLAUDE_MODEL") or None,
         max_budget_usd=float(budget) if budget else None,
         allow_bash=os.environ.get("CLAUDE_ALLOW_BASH", "true").lower() == "true",
         morning_reminder=_time_or_none(os.environ.get("MORNING_REMINDER", "08:00")),

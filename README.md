@@ -153,3 +153,76 @@ trainer_bot/
 ## Лицензия
 
 MIT. База упражнений free-exercise-db — Unlicense (public domain).
+
+## Codex с подпиской ChatGPT Plus
+
+Бот поддерживает два движка: `AGENT_ENGINE=claude` (по умолчанию) и
+`AGENT_ENGINE=codex`. Codex запускается через CLI 0.166.0, использует вход ChatGPT
+и лимиты Codex вашей подписки. API-ключ OpenAI не требуется; бот принудительно
+выбирает `forced_login_method=chatgpt` и не использует пользовательский config.toml.
+Доступность выбранной модели зависит от аккаунта; `CODEX_MODEL=` оставляет модель по умолчанию.
+
+В `.env`:
+
+```dotenv
+AGENT_ENGINE=codex
+CODEX_MODEL=
+CODEX_REASONING_EFFORT=
+```
+
+### Docker
+
+```bash
+mkdir -p data/trainer data/claude data/codex
+sudo chown -R 1000:1000 data
+# После заполнения .env:
+docker compose build
+docker compose run --rm trainer-bot codex login --device-auth
+docker compose run --rm trainer-bot codex login status
+docker compose up -d
+```
+
+Откройте ссылку, показанную CLI, и введите одноразовый код, войдя в аккаунт с Plus.
+Если требуется, включите device-code authentication в настройках безопасности ChatGPT.
+Авторизация и история сохраняются в `data/codex`; это приватные данные, не добавляйте их в Git.
+
+### Без Docker
+
+Установите Node.js 22 и CLI под пользователем, который запускает бот:
+
+```bash
+npm install -g @openai/codex@0.166.0
+codex login --device-auth
+codex login status
+```
+
+Для systemd задайте `CODEX_BIN` абсолютным путём к `codex`, если его нет в PATH сервиса.
+Рекомендуется отдельный пользователь бота с собственным `~/.codex`.
+Можно задать `CODEX_HOME` для отдельного каталога авторизации и истории — одинаково при входе и запуске.
+После обновления проекта выполните `.venv/bin/pip install -e .` и перезапустите сервис.
+
+### Поведение Codex
+
+- Сессии привязаны к чатам и сохраняются в `.bot/codex-sessions.json`, отдельно от Claude.
+- `/new` сбрасывает текущую беседу выбранного движка; файлы плана и журнала остаются.
+- `/stop` останавливает процесс текущего хода и его MCP-процессы.
+- Правила тренера читаются из существующего `CLAUDE.md`; переименовывать его не нужно.
+- Инструменты отправки карточек, файлов и упражнений доступны через отдельный stdio MCP-сервер.
+- Codex работает с sandbox `workspace-write` и без интерактивных запросов разрешений.
+  `CLAUDE_ALLOW_BASH` и `CLAUDE_MAX_BUDGET_USD` относятся только к Claude.
+- `/status` показывает подписку вместо выдуманной долларовой стоимости.
+- Достигнутый лимит подписки не переключает бота на платный API.
+
+Официальная документация рекомендует API-авторизацию для программных CLI-процессов;
+этот режим использует вход ChatGPT для персонального бота, а не API-ключ из подписки.
+Авторизация может потребовать повторного входа; лимиты аккаунта сохраняются.
+
+### MCP требует approval при policy never
+
+Ошибка `MCP tool call requires approval, but approval policy is never` означает,
+что Codex заблокировал инструмент до обращения к Telegram. Бот явно задаёт
+`mcp_servers.tg.tools.<имя>.approval_mode="approve"` для своих пяти инструментов
+и ограничивает список через `enabled_tools`. Общая политика `never` и sandbox сохраняются.
+Обновите код бота и перезапустите сервис (для Docker пересоберите образ).
+Править `~/.codex/config.toml` бесполезно: бот запускает CLI с `--ignore-user-config`.
+После обновления попросите повторно отправить уже сохранённый HTML через `send_artifact`.
